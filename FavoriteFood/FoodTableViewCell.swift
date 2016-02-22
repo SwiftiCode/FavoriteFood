@@ -11,6 +11,9 @@ import UIKit
 class FoodTableViewCell: UITableViewCell {
     
     // MARK: Properties
+    @IBOutlet weak var cellFoodLabel: UILabel!
+    @IBOutlet weak var cellFoodPhotoView: UIImageView!
+    @IBOutlet weak var cellFoodRatingControl: RatingControl!
     
     
     
