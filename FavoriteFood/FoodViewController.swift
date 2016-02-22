@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  FoodViewController.swift
 //  FavoriteFood
 //
 //  Created by Thomas.Tay.sg on 22/2/16.
@@ -8,8 +8,11 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class FoodViewController: UIViewController {
+    
+    // MARK: Properties
 
+    // MARK: Default Template
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -19,6 +22,15 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    // MARK: UITextFieldDelegate
+    
+    // MARK: UIImagePickerControllerDelegate
+    
+    // MARK: Navigation
+    
+    // MARK: IBAction
+    
 
 
 }
