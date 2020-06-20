@@ -21,10 +21,14 @@ class FoodTableViewController: UITableViewController {
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        self.navigationItem.leftBarButtonItem = self.editButtonItem()
+        self.navigationItem.leftBarButtonItem = self.editButtonItem
         
+        if let gotSavedFood = loadSavedFood() {
+            foodCollection += gotSavedFood
+        } else {
+            loadFoodSample()
+        }
         
-        loadFoodSample()
     }
 
     override func didReceiveMemoryWarning() {
@@ -34,21 +38,21 @@ class FoodTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return foodCollection.count
     }
 
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cellIdentifier = "FoodTableViewCell"
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! FoodTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! FoodTableViewCell
 
         // Configure the cell...
         let localFood = foodCollection[indexPath.row]
@@ -63,7 +67,7 @@ class FoodTableViewController: UITableViewController {
 
     
     // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
@@ -71,13 +75,13 @@ class FoodTableViewController: UITableViewController {
 
     
     // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
             // Delete the row from the data source
-            foodCollection.removeAtIndex(indexPath.row)
+            foodCollection.remove(at: indexPath.row)
             saveFood()
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
@@ -102,17 +106,17 @@ class FoodTableViewController: UITableViewController {
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
         
         if segue.identifier == "EditFood" {
             
-            let editFoodViewController = segue.destinationViewController as! FoodViewController
+            let editFoodViewController = segue.destination as! FoodViewController
             
             if let selectedCell = sender as? FoodTableViewCell {
                 
-                let selectedIndexPath = tableView.indexPathForCell(selectedCell)!
+                let selectedIndexPath = tableView.indexPath(for: selectedCell)!
                 let selectedFood = foodCollection[selectedIndexPath.row]
                 editFoodViewController.currentFood = selectedFood
                 
@@ -121,22 +125,22 @@ class FoodTableViewController: UITableViewController {
     }
     
     
-    @IBAction func unwindToFoodList (unwindSegue: UIStoryboardSegue) {
+    @IBAction func unwindToFoodList (_ unwindSegue: UIStoryboardSegue) {
         
-        if let foodSourceViewController = unwindSegue.sourceViewController as? FoodViewController, let foodToSave = foodSourceViewController.currentFood {
+        if let foodSourceViewController = unwindSegue.source as? FoodViewController, let foodToSave = foodSourceViewController.currentFood {
             
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
                 
                 // Edit Food
                 foodCollection[selectedIndexPath.row] = foodToSave
-                tableView.reloadRowsAtIndexPaths([selectedIndexPath], withRowAnimation: .None)
+                tableView.reloadRows(at: [selectedIndexPath], with: .none)
             
             } else {
             
                 // Add New Food
-                let newIndexPath = NSIndexPath(forRow: foodCollection.count, inSection: 0)
+                let newIndexPath = IndexPath(row: foodCollection.count, section: 0)
                 foodCollection.append(foodToSave)
-                tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
+                tableView.insertRows(at: [newIndexPath], with: .bottom)
             
             }
             
@@ -165,6 +169,16 @@ class FoodTableViewController: UITableViewController {
 
     // MARK: NSCoding
     func saveFood() {
+        
+        let isGoodSave = NSKeyedArchiver.archiveRootObject(foodCollection, toFile: Food.ArchiveURL.path)
+        if !isGoodSave {
+            print("Error Saving file!")
+        }
+    }
+    
+    func loadSavedFood() -> [Food]? {
+        
+        return NSKeyedUnarchiver.unarchiveObject(withFile: Food.ArchiveURL.path) as? [Food]
         
     }
 

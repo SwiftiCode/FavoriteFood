@@ -26,6 +26,9 @@ class FoodViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        //self.automaticallyAdjustsScrollViewInsets = false
+        
+        
         foodNameTextField.delegate = self
         
         if let gotEditFood = currentFood {
@@ -48,25 +51,25 @@ class FoodViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     }
     
     // MARK: UITextFieldDelegate
-    func textFieldDidBeginEditing(textField: UITextField) {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
         
-        saveButton.enabled = false
+        saveButton.isEnabled = false
         
     }
     
-    func textFieldDidEndEditing(textField: UITextField) {
+    func textFieldDidEndEditing(_ textField: UITextField) {
         
         let nameChecked = textField.text ?? ""
         if !nameChecked.isEmpty {
             foodLabel.text = foodNameTextField.text
-            saveButton.enabled = true
+            saveButton.isEnabled = true
         } else {
             foodLabel.text = "Food Name"
-            saveButton.enabled = false
+            saveButton.isEnabled = false
         }
     }
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         textField.resignFirstResponder()
         return true
@@ -75,38 +78,38 @@ class FoodViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     func checkValidName() {
         
         let nameToCheck = foodNameTextField.text ?? ""
-        saveButton.enabled = !nameToCheck.isEmpty
+        saveButton.isEnabled = !nameToCheck.isEmpty
     
     }
     
     // MARK: UIImagePickerControllerDelegate
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
         
         foodPhotoView.image = image
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
         
     }
     
-    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
         
     }
     
     // MARK: Navigation
-    @IBAction func cancelFood(sender: UIBarButtonItem) {
+    @IBAction func cancelFood(_ sender: UIBarButtonItem) {
         
         let isAddMode = presentingViewController is UINavigationController
         if isAddMode {
-            dismissViewControllerAnimated(true, completion: nil)
+            dismiss(animated: true, completion: nil)
         } else {
-            navigationController!.popViewControllerAnimated(true)
+            navigationController!.popViewController(animated: true)
         }
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        if sender === saveButton {
+        if sender as AnyObject? === saveButton {
             
             let myFoodName = foodLabel.text!
             let myFoodPhoto = foodPhotoView.image!
@@ -117,15 +120,15 @@ class FoodViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     }
     
     // MARK: IBAction
-    @IBAction func pickFoodPhoto(sender: UITapGestureRecognizer) {
+    @IBAction func pickFoodPhoto(_ sender: UITapGestureRecognizer) {
         
         foodNameTextField.resignFirstResponder()
         
         let myPhotoPicker = UIImagePickerController()
-        myPhotoPicker.sourceType = .PhotoLibrary
+        myPhotoPicker.sourceType = .photoLibrary
         myPhotoPicker.delegate = self
         
-        presentViewController(myPhotoPicker, animated: true, completion: nil)
+        present(myPhotoPicker, animated: true, completion: nil)
         
     }
     

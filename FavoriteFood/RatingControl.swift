@@ -32,13 +32,13 @@ class RatingControl: UIView {
             
             let starButton = UIButton()
             
-            starButton.setImage(emptyStarPic, forState: .Normal)
-            starButton.setImage(filledStarPic, forState: .Selected)
-            starButton.setImage(filledStarPic, forState: [.Highlighted, .Selected])
+            starButton.setImage(emptyStarPic, for: UIControl.State())
+            starButton.setImage(filledStarPic, for: .selected)
+            starButton.setImage(filledStarPic, for: [.highlighted, .selected])
             
             starButton.adjustsImageWhenHighlighted = false
             
-            starButton.addTarget(self, action: "starTapped:", forControlEvents: .TouchDown)
+            starButton.addTarget(self, action: #selector(RatingControl.starTapped(_:)), for: .touchDown)
             
             starCollection += [starButton]
             
@@ -46,7 +46,7 @@ class RatingControl: UIView {
         }
     }
     
-    override func intrinsicContentSize() -> CGSize {
+    override var intrinsicContentSize : CGSize {
         
         let starSize = Int(frame.size.height)
         let totalWidth = totalStars * (starSize + spacing)
@@ -59,7 +59,7 @@ class RatingControl: UIView {
         let starSize = Int(frame.size.height)
         var starFrame = CGRect(x: 0, y: 0, width: starSize, height: starSize)
         
-        for (index, star) in starCollection.enumerate() {
+        for (index, star) in starCollection.enumerated() {
             starFrame.origin.x = CGFloat(index * (starSize + spacing))
             star.frame = starFrame
         }
@@ -68,9 +68,9 @@ class RatingControl: UIView {
     }
     
     // MARK: IBAction
-    func starTapped(star: UIButton) {
+    @objc func starTapped(_ star: UIButton) {
         
-        foodRating = starCollection.indexOf(star)! + 1
+        foodRating = starCollection.firstIndex(of: star)! + 1
         //print(foodRating)
         
         updateStarState()
@@ -78,8 +78,8 @@ class RatingControl: UIView {
     
     func updateStarState(){
         
-        for (index, star) in starCollection.enumerate() {
-            star.selected = index < foodRating
+        for (index, star) in starCollection.enumerated() {
+            star.isSelected = index < foodRating
         }
         
     }
