@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import os.log
 
 class FoodTableViewController: UITableViewController {
     
@@ -168,17 +169,46 @@ class FoodTableViewController: UITableViewController {
     
 
     // MARK: NSCoding
-    func saveFood() {
+    private func saveFood() {
         
+        /*
         let isGoodSave = NSKeyedArchiver.archiveRootObject(foodCollection, toFile: Food.ArchiveURL.path)
-        if !isGoodSave {
-            print("Error Saving file!")
+        if isGoodSave {
+            os_log("Meals successfully saved.", log: OSLog.default, type: .debug)
+        } else {
+            os_log("Failed to save meals...", log: OSLog.default, type: .error)
+        }*/
+        
+        //let fullPath = getDocumentsDirectory().appendingPathComponent("meals")
+
+        do {
+            let data = try NSKeyedArchiver.archivedData(withRootObject: foodCollection, requiringSecureCoding: false)
+            try data.write(to: Food.ArchiveURL)
+            os_log("Meals successfully saved.", log: OSLog.default, type: .debug)
+        } catch {
+            os_log("Failed to save meals...", log: OSLog.default, type: .error)
         }
+        
     }
     
-    func loadSavedFood() -> [Food]? {
+    private func loadSavedFood() -> [Food]? {
         
-        return NSKeyedUnarchiver.unarchiveObject(withFile: Food.ArchiveURL.path) as? [Food]
+        // return NSKeyedUnarchiver.unarchiveObject(withFile: Food.ArchiveURL.path) as? [Food]
+        
+        if let myData = NSData(contentsOf: Food.ArchiveURL) {
+            do {
+
+                let data = Data(referencing:myData)
+
+                if let gotFood = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Food] {
+                    return gotFood
+                }
+            } catch {
+                os_log("Couldn't read file.", log: OSLog.default, type: .error)
+                return nil
+            }
+        }
+        return nil
         
     }
 
